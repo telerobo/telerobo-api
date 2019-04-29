@@ -3,12 +3,6 @@ const router = express.Router();
 const warnings = require('./warnings');
 const messagingResponse = require('twilio').twiml.MessagingResponse;
 
-router.get('/', async (req, res) => {
-    res.render('index', {
-        title: 'Telerobo - API'
-    });
-});
-
 router.get('/ping', async (req, res) => {
     res.send("pong");
 });

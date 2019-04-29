@@ -5,7 +5,6 @@ class Warnings {
     constructor() {
         this.index = {};
         this.client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
-
     }
 
     startScan() {
