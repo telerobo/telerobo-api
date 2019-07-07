@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const infos = require('./infos');
 const warnings = require('./warnings');
 const messagingResponse = require('twilio').twiml.MessagingResponse;
 
@@ -31,15 +32,8 @@ router.post('/receive', async (req, res) => {
         response = new messagingResponse();
         response.message(`Thank you for acknowledging ${location}`);
     } else if (body.match(/info/)) {
-        let location = body
-            .toLowerCase()
-            .split('info')
-            .filter(s => s)
-            .map(s => s.trim())
-            .pop();
-
         response = new messagingResponse();
-        response.message(`Thank you for asking info for ${location}`);
+        response.message(await infos.getMessage());
     }
 
     if (!response) {
@@ -63,7 +57,8 @@ router.post('/send', async (req, res) => {
 
 
 router.post('/info', async (req, res) => {
-
+    let response = await infos.set(req.body.adcValues);
+    res.send(response);
 });
 
 module.exports = router;
