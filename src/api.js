@@ -20,7 +20,7 @@ router.post('/receive', async (req, res) => {
     let response;
     let body = req.body.Body;
 
-    if (body.match(/ok/)) {
+    if (body.match(/ok/i)) {
         let location = body
             .toLowerCase()
             .split('ok')
@@ -31,7 +31,7 @@ router.post('/receive', async (req, res) => {
 
         response = new messagingResponse();
         response.message(`Thank you for acknowledging ${location}`);
-    } else if (body.match(/info/)) {
+    } else if (body.match(/info/i)) {
         response = new messagingResponse();
         response.message(await infos.getMessage());
     }
