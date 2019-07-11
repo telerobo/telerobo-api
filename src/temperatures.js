@@ -1,7 +1,7 @@
 const redis = require("redis");
 const {promisify} = require('util');
 
-class Infos {
+class Temperatures {
     constructor() {
         this.client = redis.createClient({ url: process.env.REDIS_URL });
         this.setAsync = promisify(this.client.set).bind(this.client);
@@ -30,7 +30,7 @@ class Infos {
     async getMessage() {
         let values = (await this.get()).split(',');
         let formattedValues = values.map((value, index) => {
-            return `${Infos.getValueKey(index)}: ${value}°C`;
+            return `${Temperatures.getValueKey(index)}: ${value}°C`;
         });
         return formattedValues.join("\n");
     }
@@ -47,4 +47,4 @@ class Infos {
     }
 }
 
-module.exports = new Infos();
+module.exports = new Temperatures();

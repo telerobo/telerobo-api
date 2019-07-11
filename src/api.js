@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const infos = require('./infos');
+const temperatures = require('./temperatures');
 const warnings = require('./warnings');
 const messagingResponse = require('twilio').twiml.MessagingResponse;
 
@@ -31,9 +31,9 @@ router.post('/receive', async (req, res) => {
 
         response = new messagingResponse();
         response.message(`Thank you for acknowledging ${location}`);
-    } else if (body.match(/info/i)) {
+    } else if (body.match(/temperature/i)) {
         response = new messagingResponse();
-        response.message(await infos.getMessage());
+        response.message(await temperatures.getMessage());
     }
 
     if (!response) {
@@ -56,9 +56,9 @@ router.post('/send', async (req, res) => {
 });
 
 
-router.post('/info', async (req, res) => {
-    let response = await infos.set(req.body.adcValues);
-    res.send(response);
+router.post('/temperatures', async (req, res) => {
+    await temperatures.set(req.body.adcValues);
+    res.send("Successfully updated values");
 });
 
 module.exports = router;
