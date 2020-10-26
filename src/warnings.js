@@ -4,43 +4,42 @@ const twilio = require('twilio');
 class Warnings {
     constructor() {
         this.index = {};
+        this.scanner = {};
         this.client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
     }
 
-    startScan() {
-        if (!this.scanner) {
-            this.scanner = setInterval(this.scan.bind(this), 30 * 1000);
+    startScan(key) {
+        if (!this.scanner[key]) {
+            this.scanner[key] = setInterval((key) => this.scan(key), 30 * 60 * 1000);
         }
 
-        this.scan();
+        this.scan(key);
     }
 
-    stopScan() {
-        clearInterval(this.scanner);
-        this.scanner = null;
+    stopScan(key) {
+        clearInterval(this.scanner[key]);
+        delete this.scanner[key];
     }
 
-    scan() {
-        Object.keys(this.index).forEach((key) => {
-            let message = this.index[key].message;
-            let recipients = this.index[key].recipients;
-            let round = this.index[key].round;
-            let to = this.index[key].recipients[round % recipients.length];
+    scan(key) {
+        let message = this.index[key].message;
+        let recipients = this.index[key].recipients;
+        let round = this.index[key].round;
+        let to = this.index[key].recipients[round % recipients.length];
 
-            try {
-                this.client.messages.create({
-                    body: message,
-                    to: to,
-                    from: `${process.env.TWILIO_NUMBER}`
-                });
-                console.debug(`Successfully called ${to}`);
-            } catch (err) {
-                console.debug(`Failed to call ${to}`);
-            }
+        try {
+            this.client.messages.create({
+                body: message,
+                to: to,
+                from: `${process.env.TWILIO_NUMBER}`
+            });
+            console.debug(`Successfully called ${to}`);
+        } catch (err) {
+            console.debug(`Failed to call ${to}`);
+        }
 
-            console.debug(`Incremented ${key} to ${this.index[key]}`);
-            this.index[key].round++;
-        });
+        console.debug(`Incremented ${key} to ${this.index[key]}`);
+        this.index[key].round++;
     }
 
     async push(location, alert, parameters) {
@@ -52,7 +51,7 @@ class Warnings {
                 message: await config.getMessage(location, alert, parameters),
             };
 
-            this.startScan();
+            this.startScan(key);
 
             return this.index[location + alert];
         } else {
@@ -64,13 +63,10 @@ class Warnings {
         Object.keys(this.index).forEach((key) => {
             if (key.startsWith(location)) {
                 console.debug(`Removed ${key}`);
+                this.stopScan(key);
                 delete this.index[key];
             }
         });
-
-        if (Object.entries(this.index).length === 0) {
-            this.stopScan();
-        }
     }
 
     acknowledged(location, alert) {
