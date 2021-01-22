@@ -49,7 +49,7 @@ class Config {
 
     async getRecipients(location, alert) {
         let row = await this.findRow(location, alert);
-        return row.recipients.split("\\n");
+        return row.recipients.split("\n");
     }
 
     async getMessage(location, alert, parameters) {
