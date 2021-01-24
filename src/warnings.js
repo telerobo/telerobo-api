@@ -22,6 +22,8 @@ class Warnings {
     }
 
     scan(key) {
+        console.log(`Scanning key '${key}'`);
+
         let message = this.index[key].message;
         let recipients = this.index[key].recipients;
         let round = this.index[key].round;
@@ -46,7 +48,7 @@ class Warnings {
         let key = location + alert;
         if (!this.index.hasOwnProperty(key)) {
             this.index[key] = {
-                round: 1,
+                round: 0,
                 recipients: await config.getRecipients(location, alert),
                 message: await config.getMessage(location, alert, parameters),
             };
