@@ -10,7 +10,7 @@ class Warnings {
 
     startScan(key) {
         if (!this.scanner[key]) {
-            this.scanner[key] = setInterval((key) => this.scan(key), 30 * 60 * 1000);
+            this.scanner[key] = setInterval((key) => this.scan(key), process.env.SCAN_INTERVAL_MINUTES * 60 * 1000);
         }
 
         this.scan(key);
